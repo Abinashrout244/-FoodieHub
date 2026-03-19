@@ -8,8 +8,9 @@ A full-stack food ordering web application built with the MERN stack (MongoDB, E
 food-app/
 ├── frontend/       # React App (User Side) - Port 5173
 ├── backend/        # Node + Express API   - Port 5000
-├── admin/          # Admin Panel (React)  - Port 5174
-├── .env            # Environment variables
+    ├── .env        # Environment variables
+   
+├── admin/          # Admin Panel (React)  - Port 5174           
 └── README.md
 ```
 
@@ -18,15 +19,6 @@ food-app/
 ### Prerequisites
 - Node.js 18+
 - MongoDB (Atlas or local)
-
-### 1. Configure Environment
-Edit `.env` in the root `food-app/` directory:
-
-```env
-MONGODB_URI=mongodb+srv://your_username:your_password@cluster0.xxxxx.mongodb.net/food-app?retryWrites=true&w=majority
-JWT_SECRET=food_app_super_secret_key_2024_xK9mP2vL8
-PORT=5000
-```
 
 ### 2. Install & Run Backend
 ```bash
