@@ -33,7 +33,7 @@ const Footer = () => {
           <motion.div variants={staggerItem}>
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'About', 'Cart', 'Profile'].map((link) => (
+              {['Home', 'Restaurants', 'About', 'Cart', 'Profile'].map((link) => (
                 <li key={link}>
                   <Link
                     to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
@@ -46,17 +46,30 @@ const Footer = () => {
             </ul>
           </motion.div>
 
-          {/* Categories */}
+          {/* Legal */}
           <motion.div variants={staggerItem}>
-            <h3 className="text-white font-semibold mb-4">Categories</h3>
+            <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
-              {['Pizza', 'Burger', 'Pasta', 'Salad', 'Dessert', 'Drinks'].map((cat) => (
-                <li key={cat}>
-                  <span className="text-gray-400 text-sm cursor-pointer hover:text-primary transition-colors">
-                    {cat}
-                  </span>
-                </li>
-              ))}
+              <li>
+                <Link to="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms-conditions" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/refund-policy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </motion.div>
 
@@ -82,10 +95,27 @@ const Footer = () => {
           </motion.div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 text-center">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} FoodieHub. All rights reserved. Made with ❤️
-          </p>
+        {/* Razorpay Badge + Copyright */}
+        <div className="border-t border-white/10 mt-10 pt-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-gray-500 text-sm">
+              © {new Date().getFullYear()} FoodieHub. All rights reserved. Made with ❤️
+            </p>
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+              <span className="text-gray-500 text-xs">Payments secured by</span>
+              <span className="text-primary font-bold text-sm">Razorpay</span>
+              <span className="text-lg">🔒</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs text-gray-600">
+            <Link to="/privacy-policy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
+            <span>·</span>
+            <Link to="/terms-conditions" className="hover:text-gray-400 transition-colors">Terms & Conditions</Link>
+            <span>·</span>
+            <Link to="/refund-policy" className="hover:text-gray-400 transition-colors">Refund Policy</Link>
+            <span>·</span>
+            <Link to="/contact" className="hover:text-gray-400 transition-colors">Contact Us</Link>
+          </div>
         </div>
       </div>
     </motion.footer>
