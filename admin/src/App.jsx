@@ -1,19 +1,20 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
-import AddItem from './pages/AddItem';
-import ListItems from './pages/ListItems';
-import Orders from './pages/Orders';
-import Restaurants from './pages/Restaurants';
-import { authAPI } from './services/api';
-import toast from 'react-hot-toast';
-import './index.css';
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
+import AddItem from "./pages/AddItem";
+import ListItems from "./pages/ListItems";
+import Orders from "./pages/Orders";
+import Home from "./pages/Home";
+import Restaurants from "./pages/Restaurants";
+import { authAPI } from "./services/api";
+import toast from "react-hot-toast";
+import "./index.css";
 
 const AdminLogin = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -21,15 +22,15 @@ const AdminLogin = ({ onLogin }) => {
     setLoading(true);
     try {
       const { data } = await authAPI.login({ email, password });
-      if (data.role !== 'admin') {
-        toast.error('Access denied. Admin only.');
+      if (data.role !== "admin") {
+        toast.error("Access denied. Admin only.");
         return;
       }
-      localStorage.setItem('admin_token', data.token);
+      localStorage.setItem("admin_token", data.token);
       onLogin(data);
-      toast.success('Welcome, Admin!');
+      toast.success("Welcome, Admin!");
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,9 @@ const AdminLogin = ({ onLogin }) => {
           <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🍔</span>
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">Admin Login</h1>
+          <h1 className="font-display text-2xl font-bold text-white">
+            Admin Login
+          </h1>
           <p className="text-gray-400 mt-1">Enter your admin credentials</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,8 +71,12 @@ const AdminLogin = ({ onLogin }) => {
               required
             />
           </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
-            {loading ? 'Logging in...' : 'Login'}
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
@@ -81,7 +88,7 @@ function App() {
   const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem("admin_token");
     if (token) {
       setAdmin({ token });
     }
@@ -93,7 +100,12 @@ function App() {
         <Toaster
           position="top-center"
           toastOptions={{
-            style: { background: '#1A1A2E', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' },
+            style: {
+              background: "#1A1A2E",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "12px",
+            },
           }}
         />
         <AdminLogin onLogin={setAdmin} />
@@ -106,17 +118,22 @@ function App() {
       <Toaster
         position="top-center"
         toastOptions={{
-          style: { background: '#1A1A2E', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' },
-          success: { iconTheme: { primary: '#FF6B35', secondary: '#fff' } },
+          style: {
+            background: "#1A1A2E",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "12px",
+          },
+          success: { iconTheme: { primary: "#FF6B35", secondary: "#fff" } },
         }}
       />
       <div className="flex min-h-screen">
         <Sidebar />
-     <div className="flex-1 md:ml-64">
+        <div className="flex-1 md:ml-64">
           <Navbar />
           <main className="pt-16 p-6">
             <Routes>
-              <Route path="/" element={<Navigate to="/add" replace />} />
+              <Route path="/" element={<Home />} />
               <Route path="/add" element={<AddItem />} />
               <Route path="/list" element={<ListItems />} />
               <Route path="/orders" element={<Orders />} />
