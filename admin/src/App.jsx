@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import AddItem from './pages/AddItem';
 import ListItems from './pages/ListItems';
 import Orders from './pages/Orders';
+import Restaurants from './pages/Restaurants';
 import { authAPI } from './services/api';
 import toast from 'react-hot-toast';
 import './index.css';
@@ -119,6 +120,7 @@ function App() {
               <Route path="/add" element={<AddItem />} />
               <Route path="/list" element={<ListItems />} />
               <Route path="/orders" element={<Orders />} />
+              <Route path="/restaurants" element={<Restaurants />} />
             </Routes>
           </main>
         </div>

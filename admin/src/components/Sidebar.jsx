@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { FiPlusCircle, FiList, FiShoppingBag, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { FiPlusCircle, FiList, FiShoppingBag, FiLogOut, FiMenu, FiX, FiHome } from 'react-icons/fi';
 import { useState } from 'react';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
+    { name: 'Restaurants', path: '/restaurants', icon: <FiHome size={20} /> },
     { name: 'Add Items', path: '/add', icon: <FiPlusCircle size={20} /> },
     { name: 'List Items', path: '/list', icon: <FiList size={20} /> },
     { name: 'Orders', path: '/orders', icon: <FiShoppingBag size={20} /> },

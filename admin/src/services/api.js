@@ -38,4 +38,31 @@ export const orderAPI = {
   updateStatus: (id, status) => api.put(`/orders/status/${id}`, { status }),
 };
 
+// Restaurant APIs (used in Restaurants.jsx admin page)
+export const restaurantAPI = {
+  // List & detail
+  getAll:  (cuisine, search) => {
+    const params = new URLSearchParams();
+    if (cuisine && cuisine !== 'All') params.append('cuisine', cuisine);
+    if (search && search.trim()) params.append('search', search.trim());
+    return api.get(`/restaurants?${params.toString()}`);
+  },
+  getById: (id)       => api.get(`/restaurants/${id}`),
+
+  // Restaurant CRUD
+  create:  (data)     => api.post('/restaurants', data),
+  update:  (id, data) => api.put(`/restaurants/${id}`, data),
+  delete:  (id)       => api.delete(`/restaurants/${id}`),
+
+  // Menu Section CRUD
+  addSection:    (id, data)             => api.post(`/restaurants/${id}/sections`, data),
+  updateSection: (id, sectionId, data)  => api.put(`/restaurants/${id}/sections/${sectionId}`, data),
+  deleteSection: (id, sectionId)        => api.delete(`/restaurants/${id}/sections/${sectionId}`),
+
+  // Menu Item CRUD
+  addItem:    (id, sectionId, data)           => api.post(`/restaurants/${id}/sections/${sectionId}/items`, data),
+  updateItem: (id, sectionId, itemId, data)   => api.put(`/restaurants/${id}/sections/${sectionId}/items/${itemId}`, data),
+  deleteItem: (id, sectionId, itemId)         => api.delete(`/restaurants/${id}/sections/${sectionId}/items/${itemId}`),
+};
+
 export default api;
