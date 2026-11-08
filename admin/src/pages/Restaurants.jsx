@@ -6,6 +6,11 @@ import {
   FiTrash2,
   FiMapPin,
   FiChevronDown,
+  FiChevronRight,
+  FiX,
+  FiAlertTriangle,
+  FiCheck,
+  FiStar,
 } from "react-icons/fi";
 import { restaurantAPI } from "../services/api";
 import toast from "react-hot-toast";
