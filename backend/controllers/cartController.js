@@ -1,14 +1,31 @@
 const Cart = require('../models/Cart');
 
+// Helper to format cart response so frontend gets populated-like structure
+const formatCartResponse = (cart) => {
+  if (!cart) return { items: [] };
+  const cartObj = cart.toObject();
+  cartObj.items = cartObj.items.map(item => ({
+    _id: item._id,
+    quantity: item.quantity,
+    productId: {
+      _id: item.productId,
+      name: item.name,
+      image: item.image,
+      price: item.price
+    }
+  }));
+  return cartObj;
+};
+
 // @desc    Get user cart
 // @route   GET /api/cart
 const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ userId: req.user._id }).populate('items.productId');
+    let cart = await Cart.findOne({ userId: req.user._id });
     if (!cart) {
       cart = { items: [] };
     }
-    res.json(cart);
+    res.json(formatCartResponse(cart));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -18,7 +35,7 @@ const getCart = async (req, res) => {
 // @route   POST /api/cart/add
 const addToCart = async (req, res) => {
   try {
-    const { productId, quantity = 1 } = req.body;
+    const { productId, quantity = 1, name, image, price } = req.body;
 
     let cart = await Cart.findOne({ userId: req.user._id });
 
@@ -33,12 +50,11 @@ const addToCart = async (req, res) => {
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      cart.items.push({ productId, quantity });
+      cart.items.push({ productId, quantity, name, image, price });
     }
 
     await cart.save();
-    cart = await Cart.findById(cart._id).populate('items.productId');
-    res.json(cart);
+    res.json(formatCartResponse(cart));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -51,17 +67,13 @@ const updateCartItem = async (req, res) => {
     const { productId, quantity } = req.body;
 
     const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
     const item = cart.items.find(
       (item) => item.productId.toString() === productId
     );
 
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found in cart' });
-    }
+    if (!item) return res.status(404).json({ message: 'Item not found in cart' });
 
     if (quantity <= 0) {
       cart.items = cart.items.filter(
@@ -72,8 +84,7 @@ const updateCartItem = async (req, res) => {
     }
 
     await cart.save();
-    const updated = await Cart.findById(cart._id).populate('items.productId');
-    res.json(updated);
+    res.json(formatCartResponse(cart));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -84,17 +95,14 @@ const updateCartItem = async (req, res) => {
 const removeFromCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
     cart.items = cart.items.filter(
       (item) => item.productId.toString() !== req.params.productId
     );
 
     await cart.save();
-    const updated = await Cart.findById(cart._id).populate('items.productId');
-    res.json(updated);
+    res.json(formatCartResponse(cart));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

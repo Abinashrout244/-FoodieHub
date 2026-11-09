@@ -1,6 +1,124 @@
-const Product = require('../models/Product');
-const path = require('path');
-const fs = require('fs');
+// const Product = require('../models/Product');
+// const path = require('path');
+// const fs = require('fs');
+
+// // @desc    Get all products (with optional category filter)
+// // @route   GET /api/products
+// const getProducts = async (req, res) => {
+//   try {
+//     const { category } = req.query;
+//     const filter = category ? { category } : {};
+//     const products = await Product.find(filter).sort({ createdAt: -1 });
+//     res.json(products);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // @desc    Get single product
+// // @route   GET /api/products/:id
+// const getProductById = async (req, res) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+//     if (product) {
+//       res.json(product);
+//     } else {
+//       res.status(404).json({ message: 'Product not found' });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // @desc    Add a product (admin)
+// // @route   POST /api/products
+// const addProduct = async (req, res) => {
+//   try {
+//     const { name, description, category, price } = req.body;
+
+//     if (!name || !description || !category || !price) {
+//       return res.status(400).json({ message: 'Please fill all fields' });
+//     }
+
+//     const image = req.file ? `/uploads/${req.file.filename}` : '';
+//     if (!image) {
+//       return res.status(400).json({ message: 'Please upload an image' });
+//     }
+
+//     const product = await Product.create({
+//       name,
+//       image,
+//       description,
+//       category,
+//       price: Number(price),
+//     });
+
+//     res.status(201).json(product);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // @desc    Update a product (admin)
+// // @route   PUT /api/products/:id
+// const updateProduct = async (req, res) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+//     if (!product) {
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
+
+//     const { name, description, category, price } = req.body;
+//     product.name = name || product.name;
+//     product.description = description || product.description;
+//     product.category = category || product.category;
+//     product.price = price ? Number(price) : product.price;
+
+//     if (req.file) {
+//       // Delete old image
+//       const oldImagePath = path.join(__dirname, '..', product.image);
+//       if (fs.existsSync(oldImagePath)) {
+//         fs.unlinkSync(oldImagePath);
+//       }
+//       product.image = `/uploads/${req.file.filename}`;
+//     }
+
+//     const updated = await product.save();
+//     res.json(updated);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // @desc    Delete a product (admin)
+// // @route   DELETE /api/products/:id
+// const deleteProduct = async (req, res) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+//     if (!product) {
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
+
+//     // Delete image file
+//     const imagePath = path.join(__dirname, '..', product.image);
+//     if (fs.existsSync(imagePath)) {
+//       fs.unlinkSync(imagePath);
+//     }
+
+//     await Product.findByIdAndDelete(req.params.id);
+//     res.json({ message: 'Product removed' });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// module.exports = { getProducts, getProductById, addProduct, updateProduct, deleteProduct };
+
+const Product = require("../models/Product");
+const Restaurant = require("../models/Restaurant");
+const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
 
 // @desc    Get all products (with optional category filter)
 // @route   GET /api/products
@@ -8,7 +126,11 @@ const getProducts = async (req, res) => {
   try {
     const { category } = req.query;
     const filter = category ? { category } : {};
-    const products = await Product.find(filter).sort({ createdAt: -1 });
+
+    const products = await Product.find(filter)
+      .populate("restaurant", "name")
+      .sort({ createdAt: -1 });
+
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -19,11 +141,15 @@ const getProducts = async (req, res) => {
 // @route   GET /api/products/:id
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate(
+      "restaurant",
+      "name",
+    );
+
     if (product) {
       res.json(product);
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -34,15 +160,43 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 const addProduct = async (req, res) => {
   try {
-    const { name, description, category, price } = req.body;
+    const { name, description, category, price, restaurantId } = req.body;
 
-    if (!name || !description || !category || !price) {
-      return res.status(400).json({ message: 'Please fill all fields' });
+    if (
+      !name ||
+      !description ||
+      !category ||
+      price === undefined ||
+      price === "" ||
+      !restaurantId
+    ) {
+      return res.status(400).json({
+        message: "Please fill all fields and select a restaurant",
+      });
     }
 
-    const image = req.file ? `/uploads/${req.file.filename}` : '';
+    // Validate MongoDB restaurant ID
+    if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+      return res.status(400).json({
+        message: "Invalid restaurant ID",
+      });
+    }
+
+    // Check whether the restaurant exists
+    const restaurant = await Restaurant.findById(restaurantId);
+
+    if (!restaurant) {
+      return res.status(404).json({
+        message: "Selected restaurant not found",
+      });
+    }
+
+    const image = req.file ? `/uploads/${req.file.filename}` : "";
+
     if (!image) {
-      return res.status(400).json({ message: 'Please upload an image' });
+      return res.status(400).json({
+        message: "Please upload an image",
+      });
     }
 
     const product = await Product.create({
@@ -51,9 +205,12 @@ const addProduct = async (req, res) => {
       description,
       category,
       price: Number(price),
+      restaurant: restaurant._id,
     });
 
-    res.status(201).json(product);
+    const populatedProduct = await product.populate("restaurant", "name");
+
+    res.status(201).json(populatedProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -64,27 +221,57 @@ const addProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({
+        message: "Product not found",
+      });
     }
 
-    const { name, description, category, price } = req.body;
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.category = category || product.category;
-    product.price = price ? Number(price) : product.price;
+    const { name, description, category, price, restaurantId } = req.body;
+
+    if (name !== undefined) product.name = name;
+    if (description !== undefined) product.description = description;
+    if (category !== undefined) product.category = category;
+
+    if (price !== undefined && price !== "") {
+      product.price = Number(price);
+    }
+
+    // Update restaurant only when a new one is provided
+    if (restaurantId) {
+      if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+        return res.status(400).json({
+          message: "Invalid restaurant ID",
+        });
+      }
+
+      const restaurant = await Restaurant.findById(restaurantId);
+
+      if (!restaurant) {
+        return res.status(404).json({
+          message: "Selected restaurant not found",
+        });
+      }
+
+      product.restaurant = restaurant._id;
+    }
 
     if (req.file) {
       // Delete old image
-      const oldImagePath = path.join(__dirname, '..', product.image);
+      const oldImagePath = path.join(__dirname, "..", product.image);
+
       if (fs.existsSync(oldImagePath)) {
         fs.unlinkSync(oldImagePath);
       }
+
       product.image = `/uploads/${req.file.filename}`;
     }
 
     const updated = await product.save();
-    res.json(updated);
+    const populatedProduct = await updated.populate("restaurant", "name");
+
+    res.json(populatedProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -95,21 +282,32 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({
+        message: "Product not found",
+      });
     }
 
     // Delete image file
-    const imagePath = path.join(__dirname, '..', product.image);
+    const imagePath = path.join(__dirname, "..", product.image);
+
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
 
     await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Product removed' });
+
+    res.json({ message: "Product removed" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { getProducts, getProductById, addProduct, updateProduct, deleteProduct };
+module.exports = {
+  getProducts,
+  getProductById,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+};
