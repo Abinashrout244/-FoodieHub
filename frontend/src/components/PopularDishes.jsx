@@ -9,7 +9,7 @@ import {
 import { FiArrowRight, FiArrowUpRight, FiStar } from "react-icons/fi";
 import { productAPI } from "../services/api";
 import { getImageUrl } from "../utils/helpers";
-
+import { Link } from "react-router-dom";
 // Decide each card's size from its position and the total number of dishes,
 // so the grid always fills with no empty space.
 const getLayout = (i, n) => {
@@ -58,6 +58,8 @@ const DishCard = ({ dish, index, size, span }) => {
     ny.set(0.5);
   };
 
+  console.log(dish);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -71,109 +73,114 @@ const DishCard = ({ dish, index, size, span }) => {
       style={{ perspective: 1000 }}
       className={span}
     >
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className={`group relative h-full ${hero ? "min-h-[420px]" : "min-h-[280px]"}`}
+      <Link
+        to={`/restaurants/${dish.restaurant?._id}`}
+        className="block h-full cursor-pointer"
       >
-        {/* Gradient border */}
-        <div className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-br from-white/20 via-white/5 to-white/10 transition-all duration-500 group-hover:from-primary group-hover:via-orange-400 group-hover:to-accent" />
+        <motion.div
+          ref={ref}
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+          className={`group relative h-full ${hero ? "min-h-[420px]" : "min-h-[280px]"}`}
+        >
+          {/* Gradient border */}
+          <div className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-br from-white/20 via-white/5 to-white/10 transition-all duration-500 group-hover:from-primary group-hover:via-orange-400 group-hover:to-accent" />
 
-        {/* Outer glow */}
-        <div className="pointer-events-none absolute -inset-2 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/30 to-accent/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+          {/* Outer glow */}
+          <div className="pointer-events-none absolute -inset-2 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/30 to-accent/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
 
-        {/* Card body */}
-        <div className="absolute inset-px overflow-hidden rounded-[1.7rem] bg-dark-lighter">
-          <img
-            src={getImageUrl(dish.image)}
-            alt={dish.name}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
-            onError={(e) => {
-              e.target.src =
-                "https://placehold.co/800x800/1a1a2e/ff6b35?text=🍽️";
-            }}
-          />
+          {/* Card body */}
+          <div className="absolute inset-px overflow-hidden rounded-[1.7rem] bg-dark-lighter">
+            <img
+              src={getImageUrl(dish.image)}
+              alt={dish.name}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
+              onError={(e) => {
+                e.target.src =
+                  "https://placehold.co/800x800/1a1a2e/ff6b35?text=🍽️";
+              }}
+            />
 
-          {/* Readability gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
+            {/* Readability gradients */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
 
-          {/* Cursor spotlight */}
-          <motion.div
-            style={{ background: glow }}
-            className="pointer-events-none absolute inset-0 opacity-0 mix-blend-screen transition-opacity duration-300 group-hover:opacity-100"
-          />
+            {/* Cursor spotlight */}
+            <motion.div
+              style={{ background: glow }}
+              className="pointer-events-none absolute inset-0 opacity-0 mix-blend-screen transition-opacity duration-300 group-hover:opacity-100"
+            />
 
-          {/* Top row */}
-          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
-            <span className="rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
-              {dish.category}
-            </span>
-            {hero ? (
-              <span className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-accent px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-primary/40">
-                <FiStar size={11} className="fill-current" /> Bestseller
+            {/* Top row */}
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
+              <span className="rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                {dish.category}
               </span>
-            ) : (
-              <span className="font-display select-none text-5xl font-black leading-none text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.4)]">
-                0{index + 1}
-              </span>
-            )}
-          </div>
+              {hero ? (
+                <span className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-accent px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-primary/40">
+                  <FiStar size={11} className="fill-current" /> Bestseller
+                </span>
+              ) : (
+                <span className="font-display select-none text-5xl font-black leading-none text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.4)]">
+                  0{index + 1}
+                </span>
+              )}
+            </div>
 
-          {/* Bottom content */}
-          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-            <div className="flex items-end justify-between gap-4">
-              <div className="min-w-0 transition-transform duration-500 lg:group-hover:-translate-y-1">
-                <h3
-                  className={`font-display font-black leading-tight tracking-tight text-white ${
-                    hero
-                      ? "text-3xl sm:text-4xl"
-                      : wide
-                        ? "text-2xl sm:text-3xl"
-                        : "text-xl"
-                  }`}
-                >
-                  {dish.name}
-                </h3>
-
-                <p
-                  className={`mt-2 text-sm leading-relaxed text-gray-300 transition-all duration-500 ${
-                    showDesc
-                      ? "line-clamp-2 max-w-md"
-                      : "line-clamp-2 lg:max-h-0 lg:translate-y-3 lg:opacity-0 lg:group-hover:max-h-14 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
-                  }`}
-                >
-                  {dish.description}
-                </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <span
-                    className={`bg-gradient-to-r from-primary to-accent bg-clip-text font-black text-transparent ${
-                      hero ? "text-3xl" : "text-2xl"
+            {/* Bottom content */}
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <div className="flex items-end justify-between gap-4">
+                <div className="min-w-0 transition-transform duration-500 lg:group-hover:-translate-y-1">
+                  <h3
+                    className={`font-display font-black leading-tight tracking-tight text-white ${
+                      hero
+                        ? "text-3xl sm:text-4xl"
+                        : wide
+                          ? "text-2xl sm:text-3xl"
+                          : "text-xl"
                     }`}
                   >
-                    ₹{dish.price}
-                  </span>
-                  <span className="h-px w-8 bg-white/30 transition-all duration-500 group-hover:w-14 group-hover:bg-primary" />
+                    {dish.name}
+                  </h3>
+
+                  <p
+                    className={`mt-2 text-sm leading-relaxed text-gray-300 transition-all duration-500 ${
+                      showDesc
+                        ? "line-clamp-2 max-w-md"
+                        : "line-clamp-2 lg:max-h-0 lg:translate-y-3 lg:opacity-0 lg:group-hover:max-h-14 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
+                    }`}
+                  >
+                    {dish.description}
+                  </p>
+
+                  <div className="mt-3 flex items-center gap-3">
+                    <span
+                      className={`bg-gradient-to-r from-primary to-accent bg-clip-text font-black text-transparent ${
+                        hero ? "text-3xl" : "text-2xl"
+                      }`}
+                    >
+                      ₹{dish.price}
+                    </span>
+                    <span className="h-px w-8 bg-white/30 transition-all duration-500 group-hover:w-14 group-hover:bg-primary" />
+                  </div>
                 </div>
+
+                <a
+                  href="#menu"
+                  aria-label={`View ${dish.name}`}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-500 group-hover:rotate-45 group-hover:border-transparent group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-accent group-hover:shadow-[0_10px_30px_-5px] group-hover:shadow-primary/70"
+                >
+                  <FiArrowUpRight size={20} />
+                </a>
               </div>
-
-              <a
-                href="#menu"
-                aria-label={`View ${dish.name}`}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-500 group-hover:rotate-45 group-hover:border-transparent group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-accent group-hover:shadow-[0_10px_30px_-5px] group-hover:shadow-primary/70"
-              >
-                <FiArrowUpRight size={20} />
-              </a>
             </div>
-          </div>
 
-          {/* Shine sweep */}
-          <div className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-        </div>
-      </motion.div>
+            {/* Shine sweep */}
+            <div className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+          </div>
+        </motion.div>
+      </Link>
     </motion.div>
   );
 };
